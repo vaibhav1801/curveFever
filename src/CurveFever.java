@@ -5,9 +5,10 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,13 +24,16 @@ public class CurveFever extends JPanel{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	int numPlayers = 1;
-	Map<Integer, Boolean> keys = new HashMap<Integer, Boolean>();
 	
+	//Key Map for key listener
+	Map<Integer, Boolean> keys = new HashMap<Integer, Boolean>();
+	// Hashset for keeping track of visited nodes
 	Set<Integer> canvas = new HashSet<Integer>();
+	//List of active unused powers
+	List<power> powerList = new ArrayList<power>();
 	
 	peg Peg1 = new peg(this);
-	
+		
 	public CurveFever(){
 		this.addKeyListener(new KeyListener(){
 				@Override
@@ -86,7 +90,7 @@ public class CurveFever extends JPanel{
 		while (true) {
 			game.move();
 			game.Peg1.paint(graphic);
-			Thread.sleep(10);
+			Thread.sleep(30);
 		}
 	}
 }

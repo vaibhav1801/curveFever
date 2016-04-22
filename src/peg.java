@@ -31,7 +31,7 @@ public class peg {
 	boolean down_key= false;
 	int moves = 0;
 	
-	final int DIAMETER=8;
+	int DIAMETER=8;
 	
 	public peg(CurveFever game){
 		this.game = game;
