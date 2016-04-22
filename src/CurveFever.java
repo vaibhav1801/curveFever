@@ -20,9 +20,6 @@ import javax.swing.JPanel;
 
 public class CurveFever extends JPanel{
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	//Key Map for key listener

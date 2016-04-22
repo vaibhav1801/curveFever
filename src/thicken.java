@@ -2,23 +2,18 @@ import java.util.List;
 
 public class thicken extends power {
 
-	public thicken() {
+	public thicken(int x,int y) {
 		// TODO Auto-generated constructor stub
+		super(x,y);
 	}
 
 	@Override
-	public void effect(peg P) {
+	public void effect() {
 		// TODO Auto-generated method stub
 		if(ttl > 0){
 			P.DIAMETER *= 1.5;
 		}
-
 	}
-
-	@Override
-	public peg collision(List<peg> Pegs) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
+	
 }
