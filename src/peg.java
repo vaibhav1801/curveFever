@@ -21,7 +21,7 @@ public class peg {
 	Random randno = new Random();
 	int x,y;
 	int xo,yo;
-	int speed = 4;
+	int speed = 2;
 	float angle = (float) (randno.nextFloat() * 2 * Math.PI);
 	final float omega = (float) 0.08;
 	int dx = 1,dy = 1;
