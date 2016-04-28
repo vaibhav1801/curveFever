@@ -1,5 +1,3 @@
-
-
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -27,7 +25,8 @@ public class CurveFever extends JPanel{
 	// Hashset for keeping track of visited nodes
 	Set<Integer> canvas = new HashSet<Integer>();
 	//List of active unused powers
-	List<power> powerList = new ArrayList<power>();
+	List<power> powerList = new ArrayList<power>(2);
+	Set<Integer> power_canvas = new HashSet<Integer>();
 	
 	peg Peg1 = new peg(this);
 		

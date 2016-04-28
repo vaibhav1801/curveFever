@@ -1,11 +1,12 @@
-
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Path2D;
+import java.awt.print.Printable;
 import java.util.Map;
 import java.util.Random;
+
+import org.omg.PortableInterceptor.ACTIVE;
 
 public class peg {
 	
@@ -30,6 +31,8 @@ public class peg {
 	boolean up_key= false;
 	boolean down_key= false;
 	int moves = 0;
+	int thick_power =0;
+	boolean thick_power_active = false;
 	
 	int DIAMETER=8;
 	
@@ -55,6 +58,7 @@ public class peg {
 			moves = 0;
 		}
 		
+		thick_power +=1;
 		moves += 1;
 		
 		if(keys.containsKey(KeyEvent.VK_LEFT)){
@@ -102,12 +106,12 @@ public class peg {
 		for(int i =-DIAMETER/2;i<DIAMETER/2;i++){ 
 			for(int j=1; j<speed;j++ ){
 		
-			if(game.canvas.contains(1000*((int)(x+i * Math.sin(angle) + j*Math.cos(angle)))+(int)(y+j*Math.sin(angle)-i*Math.cos(angle)))){
-				System.out.println("Overlap");
-				System.out.print(game.canvas);
-				game.gameOver();
+				if(game.canvas.contains(1000*((int)(x+i * Math.sin(angle) + j*Math.cos(angle)))+(int)(y+j*Math.sin(angle)-i*Math.cos(angle)))){
+					System.out.println("Overlap");
+					System.out.print(game.canvas);
+					game.gameOver();
+				}
 			}
-		}
 		}
 //		game.canvas.add(1000*x+y);
 	}
@@ -123,8 +127,63 @@ public class peg {
 			g.setColor(g.getBackground());
 			g.fillOval(xo, yo, DIAMETER, DIAMETER);
 		}
-		
-		
+		if(thick_power % 60 ==0 && !thick_power_active  ){
+			
+			thick_power_active = true;
+			System.out.println("thick_power_active");
+			int x1 = 200+randno.nextInt(800 - 1);
+			int y1 = 200+randno.nextInt(200- 1);
+			while (game.canvas.contains((1000*x1)+y1)){
+				x1 = 200+randno.nextInt(800 - 1);
+				y1 = 200+randno.nextInt(200- 1);
+			}
+			thicken thick_power = new thicken(x1,y1);
+			for(int i =-DIAMETER;i<DIAMETER;i++){ 
+				for(int j=1; j<speed;j++ ){
+					game.power_canvas.add(1000*((int)(x1+i * Math.sin(angle) + j*Math.cos(angle)))+(int)(y1+j*Math.sin(angle)-i*Math.cos(angle)));
+				}
+			}
+			game.powerList.add(thick_power);
+			
+						
+		} 
+		if(thick_power_active ){
+			thicken temp = (thicken)game.powerList.get(0);
+			if(!temp.isActive){
+				if(game.power_canvas.contains((1000*x)+y)){
+					temp.collision(this);
+					g.setColor(Color.BLACK);
+					g.fillOval(temp.x, temp.y, DIAMETER, DIAMETER);
+					game.power_canvas.clear();
+					thick_power=0;
+				}
+				else{
+					g.setColor(Color.BLUE);
+				    g.fillOval(temp.x , temp.y ,DIAMETER, DIAMETER);
+				}
+			}
+			else{
+				
+				if(temp.ttl==1){
+					game.powerList.clear();
+					thick_power_active = false;
+					temp.decay();
+				}else{
+					temp.decay();
+				}
+				
+			}
+			
+			System.out.print("temp.isActive :");
+			System.out.println(temp.isActive);
+			temp.decay();
+			System.out.print("thick_power :");
+			System.out.println(thick_power);
+			
+			
+		}
+		System.out.print("thick_power_active");
+		System.out.println(thick_power_active);
 	}
 	
 	public void paintTrail(Graphics2D g){

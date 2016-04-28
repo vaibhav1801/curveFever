@@ -16,9 +16,11 @@ public abstract class power {
 	}
 	
 	public void collision(peg Pegs){
-		this.P = Pegs;
-		isActive=true;
-		effect();
+		if(!isActive){
+			this.P = Pegs;
+			isActive=true;
+			effect();
+		}
 	}
 	
 	public void decay(){ 
