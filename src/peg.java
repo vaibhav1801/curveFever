@@ -1,7 +1,9 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.print.Printable;
 import java.util.Map;
 import java.util.Random;
@@ -35,6 +37,10 @@ public class peg {
 	boolean thick_power_active = false;
 	
 	int DIAMETER=8;
+	
+	Path2D.Double path_new = new Path2D.Double();
+	//Path2D.Double path = new Path2D.Double();
+	
 	
 	public peg(CurveFever game){
 		this.game = game;
@@ -103,7 +109,7 @@ public class peg {
 		else 
 			y = y + dy;
 		
-		for(int i =-DIAMETER/2;i<DIAMETER/2;i++){ 
+/*		for(int i =-DIAMETER/2;i<DIAMETER/2;i++){ 
 			for(int j=1; j<speed;j++ ){
 		
 				if(game.canvas.contains(1000*((int)(x+i * Math.sin(angle) + j*Math.cos(angle)))+(int)(y+j*Math.sin(angle)-i*Math.cos(angle)))){
@@ -112,7 +118,18 @@ public class peg {
 					game.gameOver();
 				}
 			}
+		}*/
+		
+		if(path_new.contains(x, y)){
+			System.out.println("Overlap");
+			game.gameOver();
 		}
+		
+		/*if(path.contains(x, y)){
+			System.out.println("Overlap");
+			game.gameOver();
+		}*/
+		
 //		game.canvas.add(1000*x+y);
 	}
 	
@@ -130,7 +147,7 @@ public class peg {
 		if(thick_power % 60 ==0 && !thick_power_active  ){
 			
 			thick_power_active = true;
-			System.out.println("thick_power_active");
+			//System.out.println("thick_power_active");
 			int x1 = 200+randno.nextInt(800 - 1);
 			int y1 = 200+randno.nextInt(200- 1);
 			while (game.canvas.contains((1000*x1)+y1)){
@@ -174,30 +191,44 @@ public class peg {
 				
 			}
 			
-			System.out.print("temp.isActive :");
-			System.out.println(temp.isActive);
+			//System.out.print("temp.isActive :");
+			//System.out.println(temp.isActive);
 			temp.decay();
-			System.out.print("thick_power :");
-			System.out.println(thick_power);
+			//System.out.print("thick_power :");
+			//System.out.println(thick_power);
 			
 			
 		}
-		System.out.print("thick_power_active");
-		System.out.println(thick_power_active);
+		//System.out.print("thick_power_active");
+		//System.out.println(thick_power_active);
 	}
 	
 	public void paintTrail(Graphics2D g){
 		g.setColor(Color.BLACK);
-//				
+//		
+		//int[] x_cord = {(int) (xo + DIAMETER/2 + (Math.sin(angle))*DIAMETER/2),(int) (xo + DIAMETER/2 - (Math.sin(angle))*DIAMETER/2),(int) (x +DIAMETER/2- Math.sin(angle)*DIAMETER/2),(int) (x +DIAMETER/2 + Math.sin(angle)*DIAMETER/2)};
+		//int[] y_cord ={(int) (yo +DIAMETER/2 - Math.cos(angle)*DIAMETER/2),(int) (yo +DIAMETER/2+ Math.cos(angle)*DIAMETER/2),(int) (y +DIAMETER/2+ Math.cos(angle)*DIAMETER/2),(int) (y +DIAMETER/2- Math.cos(angle)*DIAMETER/2)};
+		
 		Path2D.Double path = new Path2D.Double();
 		path.moveTo(xo + DIAMETER/2 + (Math.sin(angle))*DIAMETER/2, yo +DIAMETER/2 - Math.cos(angle)*DIAMETER/2);
 		path.lineTo(xo + DIAMETER/2 - (Math.sin(angle))*DIAMETER/2, yo +DIAMETER/2+ Math.cos(angle)*DIAMETER/2);
 		path.lineTo(x +DIAMETER/2- Math.sin(angle)*DIAMETER/2, y +DIAMETER/2+ Math.cos(angle)*DIAMETER/2);
 		path.lineTo(x +DIAMETER/2 + Math.sin(angle)*DIAMETER/2, y +DIAMETER/2- Math.cos(angle)*DIAMETER/2);
 		
+		/*path.moveTo(x_cord[0], y_cord[0]);
+		path.lineTo(x_cord[1], y_cord[1]);
+		path.lineTo(x_cord[2], y_cord[2]);
+		path.lineTo(x_cord[3],y_cord[3]);*/			
 		path.closePath();
+		
+		Rectangle2D bound_rect = path.getBounds2D();
+		
 		g.fill(path);
-
+		
+		//Polygon curr_poly = new Polygon(x_cord,y_cord, 4);
+		//Rectangle2D bound_rect = curr_poly.getBounds2D();
+		path_new.append(bound_rect, false);
+		//g.fill(path_new);
 		game.canvas.add(1000*x+y);
 	}
 	
@@ -213,7 +244,7 @@ public class peg {
 			
 		}
 		
-		System.out.println(angle);
+		//System.out.println(angle);
 		
 	}
 	
