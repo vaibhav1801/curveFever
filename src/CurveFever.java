@@ -26,7 +26,9 @@ public class CurveFever extends JPanel{
 	Set<Integer> canvas = new HashSet<Integer>();
 	//List of active unused powers
 	List<power> powerList = new ArrayList<power>(2);
-	Set<Integer> power_canvas = new HashSet<Integer>();
+	//Set<Integer> power_canvas = new HashSet<Integer>();
+	List<Integer> power_canvas = new ArrayList<Integer>();
+	
 	
 	peg Peg1 = new peg(this);
 		

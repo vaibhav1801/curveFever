@@ -1,8 +1,12 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Area;
 import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.awt.print.Printable;
 import java.util.Map;
@@ -41,6 +45,11 @@ public class peg {
 	Path2D.Double path_new = new Path2D.Double();
 	//Path2D.Double path = new Path2D.Double();
 	
+	public static boolean testIntersection(Shape shapeA, Shape shapeB) {
+        Area areaA = new Area(shapeA);
+        areaA.intersect(new Area(shapeB));
+        return !areaA.isEmpty();
+}
 	
 	public peg(CurveFever game){
 		this.game = game;
@@ -120,12 +129,30 @@ public class peg {
 			}
 		}*/
 		
-		if(path_new.contains(x, y)){
+		Path2D.Double path2 = new Path2D.Double();
+		path2.moveTo(x + DIAMETER/2 + (Math.sin(angle))*DIAMETER/2, y +DIAMETER/2 - Math.cos(angle)*DIAMETER/2);
+		path2.lineTo(x + DIAMETER/2 - (Math.sin(angle))*DIAMETER/2, y +DIAMETER/2+ Math.cos(angle)*DIAMETER/2);
+		path2.lineTo((x+(Math.cos(angle)*speed)) +DIAMETER/2- Math.sin(angle)*DIAMETER/2, (y+(Math.sin(angle)*speed)) +DIAMETER/2+ Math.cos(angle)*DIAMETER/2);
+		path2.lineTo((x+(Math.cos(angle)*speed)) +DIAMETER/2 + Math.sin(angle)*DIAMETER/2, (y+(Math.sin(angle)*speed)) +DIAMETER/2- Math.cos(angle)*DIAMETER/2);
+				
+		path2.closePath();
+		
+		
+		if(testIntersection((Shape)path_new,(Shape)path2)){
 			System.out.println("Overlap");
 			game.gameOver();
 		}
 		
-		/*if(path.contains(x, y)){
+		
+/*		if(path_new.contains(path2.getBounds2D())){
+			System.out.println("Overlap");
+			game.gameOver();
+		}*/
+		
+	/*	double x1 =x+DIAMETER/2+1*(Math.cos(angle)*speed);	
+		double y1 =y+DIAMETER/2+1*(Math.sin(angle)*speed);
+		
+		if(path_new.contains(x1, y1)){
 			System.out.println("Overlap");
 			game.gameOver();
 		}*/
@@ -154,12 +181,16 @@ public class peg {
 				x1 = 200+randno.nextInt(800 - 1);
 				y1 = 200+randno.nextInt(200- 1);
 			}
+			game.power_canvas.add(x1);
+			game.power_canvas.add(y1);
+			
+			
 			thicken thick_power = new thicken(x1,y1);
-			for(int i =-DIAMETER;i<DIAMETER;i++){ 
+/*			for(int i =-DIAMETER;i<DIAMETER;i++){ 
 				for(int j=1; j<speed;j++ ){
 					game.power_canvas.add(1000*((int)(x1+i * Math.sin(angle) + j*Math.cos(angle)))+(int)(y1+j*Math.sin(angle)-i*Math.cos(angle)));
 				}
-			}
+			}*/
 			game.powerList.add(thick_power);
 			
 						
@@ -167,7 +198,30 @@ public class peg {
 		if(thick_power_active ){
 			thicken temp = (thicken)game.powerList.get(0);
 			if(!temp.isActive){
-				if(game.power_canvas.contains((1000*x)+y)){
+				//if(game.power_canvas.contains((1000*x)+y)){
+				/*double x1 =game.power_canvas.get(0)+DIAMETER/2;	
+				double y1 =game.power_canvas.get(1)+DIAMETER/2;
+				
+				Path2D.Double path2 = new Path2D.Double();
+				path2.moveTo(x1 + (Math.sin(angle))*DIAMETER/2, y1 - Math.cos(angle)*DIAMETER/2);
+				path2.lineTo(x1 - (Math.sin(angle))*DIAMETER/2, y1+ Math.cos(angle)*DIAMETER/2);
+				path2.lineTo((game.power_canvas.get(0)-(Math.cos(angle)*speed)) +DIAMETER/2- Math.sin(angle)*DIAMETER/2, (game.power_canvas.get(1)-(Math.sin(angle)*speed)) +DIAMETER/2+ Math.cos(angle)*DIAMETER/2);
+				path2.lineTo((game.power_canvas.get(0)-(Math.cos(angle)*speed)) +DIAMETER/2 + Math.sin(angle)*DIAMETER/2, (game.power_canvas.get(1)-(Math.sin(angle)*speed)) +DIAMETER/2- Math.cos(angle)*DIAMETER/2);
+						*/
+				
+				double x1 =game.power_canvas.get(0);	
+				double y1 =game.power_canvas.get(1);
+				
+				Path2D.Double path2 = new Path2D.Double();
+				path2.moveTo(x + DIAMETER/2 + (Math.sin(angle))*DIAMETER/2, y +DIAMETER/2 - Math.cos(angle)*DIAMETER/2);
+				path2.lineTo(x + DIAMETER/2 - (Math.sin(angle))*DIAMETER/2, y +DIAMETER/2+ Math.cos(angle)*DIAMETER/2);
+				path2.lineTo((x+(Math.cos(angle)*speed)) +DIAMETER/2- Math.sin(angle)*DIAMETER/2, (y+(Math.sin(angle)*speed)) +DIAMETER/2+ Math.cos(angle)*DIAMETER/2);
+				path2.lineTo((x+(Math.cos(angle)*speed)) +DIAMETER/2 + Math.sin(angle)*DIAMETER/2, (y+(Math.sin(angle)*speed)) +DIAMETER/2- Math.cos(angle)*DIAMETER/2);
+						
+				path2.closePath();
+								
+				if(testIntersection((Shape)path2,new Rectangle((int)x1,(int) y1, DIAMETER, DIAMETER))){				
+				//if(path_new.contains(x1, y1)){			
 					temp.collision(this);
 					g.setColor(Color.BLACK);
 					g.fillOval(temp.x, temp.y, DIAMETER, DIAMETER);
@@ -221,13 +275,14 @@ public class peg {
 		path.lineTo(x_cord[3],y_cord[3]);*/			
 		path.closePath();
 		
-		Rectangle2D bound_rect = path.getBounds2D();
+		//Rectangle2D bound_rect = path.getBounds2D();
 		
 		g.fill(path);
 		
 		//Polygon curr_poly = new Polygon(x_cord,y_cord, 4);
 		//Rectangle2D bound_rect = curr_poly.getBounds2D();
-		path_new.append(bound_rect, false);
+		//path_new.append(bound_rect, false);
+		path_new.append(path, false);
 		//g.fill(path_new);
 		game.canvas.add(1000*x+y);
 	}
