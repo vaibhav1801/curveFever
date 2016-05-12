@@ -2,7 +2,7 @@ import java.util.List;
 
 public abstract class power {
 	
-	int ttl = 80;
+	int ttl = 100;
 	int x,y;
 	peg P;
 	boolean isActive = false;

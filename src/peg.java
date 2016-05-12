@@ -9,20 +9,14 @@ import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.awt.print.Printable;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.omg.PortableInterceptor.ACTIVE;
 
 public class peg {
-	
-	class Point{
-		int x,y;
-		public Point(int x,int y){
-			this.x = x;
-			this.y = y;
-		}
-	}
 	
 	private CurveFever game;
 	Random randno = new Random();
@@ -49,7 +43,9 @@ public class peg {
         Area areaA = new Area(shapeA);
         areaA.intersect(new Area(shapeB));
         return !areaA.isEmpty();
-}
+	}
+	
+	
 	
 	public peg(CurveFever game){
 		this.game = game;
@@ -118,79 +114,56 @@ public class peg {
 		else 
 			y = y + dy;
 		
-/*		for(int i =-DIAMETER/2;i<DIAMETER/2;i++){ 
+		for(int i =-DIAMETER/2;i<DIAMETER/2;i++){ 
 			for(int j=1; j<speed;j++ ){
 		
-				if(game.canvas.contains(1000*((int)(x+i * Math.sin(angle) + j*Math.cos(angle)))+(int)(y+j*Math.sin(angle)-i*Math.cos(angle)))){
+				if(game.canvas.contains(1000*((int)(x +i * Math.sin(angle) + j*Math.cos(angle)))+(int)(y+j*Math.sin(angle)-i*Math.cos(angle)))){
 					System.out.println("Overlap");
-					System.out.print(game.canvas);
+					System.out.println(game.canvas);
+					System.out.println(game.power_canvas);
+					
+					
+					
 					game.gameOver();
 				}
 			}
-		}*/
-		
-		Path2D.Double path2 = new Path2D.Double();
-		path2.moveTo(x + DIAMETER/2 + (Math.sin(angle))*DIAMETER/2, y +DIAMETER/2 - Math.cos(angle)*DIAMETER/2);
-		path2.lineTo(x + DIAMETER/2 - (Math.sin(angle))*DIAMETER/2, y +DIAMETER/2+ Math.cos(angle)*DIAMETER/2);
-		path2.lineTo((x+(Math.cos(angle)*speed)) +DIAMETER/2- Math.sin(angle)*DIAMETER/2, (y+(Math.sin(angle)*speed)) +DIAMETER/2+ Math.cos(angle)*DIAMETER/2);
-		path2.lineTo((x+(Math.cos(angle)*speed)) +DIAMETER/2 + Math.sin(angle)*DIAMETER/2, (y+(Math.sin(angle)*speed)) +DIAMETER/2- Math.cos(angle)*DIAMETER/2);
-				
-		path2.closePath();
-		
-		
-		if(testIntersection((Shape)path_new,(Shape)path2)){
-			System.out.println("Overlap");
-			game.gameOver();
 		}
 		
 		
-/*		if(path_new.contains(path2.getBounds2D())){
-			System.out.println("Overlap");
-			game.gameOver();
-		}*/
-		
-	/*	double x1 =x+DIAMETER/2+1*(Math.cos(angle)*speed);	
-		double y1 =y+DIAMETER/2+1*(Math.sin(angle)*speed);
-		
-		if(path_new.contains(x1, y1)){
-			System.out.println("Overlap");
-			game.gameOver();
-		}*/
-		
-//		game.canvas.add(1000*x+y);
 	}
 	
 	public void paint(Graphics2D g) {
-			
-		g.setColor(Color.BLACK);
-		g.fillOval(x, y, DIAMETER, DIAMETER);
 		
+
+		g.setColor(Color.BLACK);
+		g.fillOval(x - DIAMETER/2, y - DIAMETER/2, DIAMETER, DIAMETER);
 		if(trail)
 			paintTrail(g);
 		else{
 			g.setColor(g.getBackground());
-			g.fillOval(xo, yo, DIAMETER, DIAMETER);
+			g.fillOval(xo - DIAMETER/2, yo - DIAMETER/2, DIAMETER, DIAMETER);
 		}
 		if(thick_power % 60 ==0 && !thick_power_active  ){
 			
 			thick_power_active = true;
-			//System.out.println("thick_power_active");
-			int x1 = 200+randno.nextInt(800 - 1);
-			int y1 = 200+randno.nextInt(200- 1);
-			while (game.canvas.contains((1000*x1)+y1)){
+
+			Set<Integer> intersection;
+			int x1, y1;
+			do{
 				x1 = 200+randno.nextInt(800 - 1);
 				y1 = 200+randno.nextInt(200- 1);
-			}
-			game.power_canvas.add(x1);
-			game.power_canvas.add(y1);
+				for(int i =-DIAMETER/2;i<DIAMETER/2;i++){ 
+					for(int j=-DIAMETER/2; j<DIAMETER/2;j++ ){
+						game.power_canvas.add(1000*((int)(x1+DIAMETER/2+i * Math.sin(angle) + j*Math.cos(angle)))+(int)(y1+DIAMETER/2+j*Math.sin(angle)-i*Math.cos(angle)));
+					}
+				}
+				intersection = new HashSet<Integer>(game.power_canvas);
+				intersection.retainAll(game.canvas);
+			}while(!intersection.isEmpty());
 			
 			
 			thicken thick_power = new thicken(x1,y1);
-/*			for(int i =-DIAMETER;i<DIAMETER;i++){ 
-				for(int j=1; j<speed;j++ ){
-					game.power_canvas.add(1000*((int)(x1+i * Math.sin(angle) + j*Math.cos(angle)))+(int)(y1+j*Math.sin(angle)-i*Math.cos(angle)));
-				}
-			}*/
+			
 			game.powerList.add(thick_power);
 			
 						
@@ -198,33 +171,13 @@ public class peg {
 		if(thick_power_active ){
 			thicken temp = (thicken)game.powerList.get(0);
 			if(!temp.isActive){
-				//if(game.power_canvas.contains((1000*x)+y)){
-				/*double x1 =game.power_canvas.get(0)+DIAMETER/2;	
-				double y1 =game.power_canvas.get(1)+DIAMETER/2;
+				Set<Integer> intersection = new HashSet<Integer>(game.power_canvas);
+				intersection.retainAll(game.canvas);
 				
-				Path2D.Double path2 = new Path2D.Double();
-				path2.moveTo(x1 + (Math.sin(angle))*DIAMETER/2, y1 - Math.cos(angle)*DIAMETER/2);
-				path2.lineTo(x1 - (Math.sin(angle))*DIAMETER/2, y1+ Math.cos(angle)*DIAMETER/2);
-				path2.lineTo((game.power_canvas.get(0)-(Math.cos(angle)*speed)) +DIAMETER/2- Math.sin(angle)*DIAMETER/2, (game.power_canvas.get(1)-(Math.sin(angle)*speed)) +DIAMETER/2+ Math.cos(angle)*DIAMETER/2);
-				path2.lineTo((game.power_canvas.get(0)-(Math.cos(angle)*speed)) +DIAMETER/2 + Math.sin(angle)*DIAMETER/2, (game.power_canvas.get(1)-(Math.sin(angle)*speed)) +DIAMETER/2- Math.cos(angle)*DIAMETER/2);
-						*/
-				
-				double x1 =game.power_canvas.get(0);	
-				double y1 =game.power_canvas.get(1);
-				
-				Path2D.Double path2 = new Path2D.Double();
-				path2.moveTo(x + DIAMETER/2 + (Math.sin(angle))*DIAMETER/2, y +DIAMETER/2 - Math.cos(angle)*DIAMETER/2);
-				path2.lineTo(x + DIAMETER/2 - (Math.sin(angle))*DIAMETER/2, y +DIAMETER/2+ Math.cos(angle)*DIAMETER/2);
-				path2.lineTo((x+(Math.cos(angle)*speed)) +DIAMETER/2- Math.sin(angle)*DIAMETER/2, (y+(Math.sin(angle)*speed)) +DIAMETER/2+ Math.cos(angle)*DIAMETER/2);
-				path2.lineTo((x+(Math.cos(angle)*speed)) +DIAMETER/2 + Math.sin(angle)*DIAMETER/2, (y+(Math.sin(angle)*speed)) +DIAMETER/2- Math.cos(angle)*DIAMETER/2);
-						
-				path2.closePath();
-								
-				if(testIntersection((Shape)path2,new Rectangle((int)x1,(int) y1, DIAMETER, DIAMETER))){				
-				//if(path_new.contains(x1, y1)){			
-					temp.collision(this);
+				if(!intersection.isEmpty()){
 					g.setColor(Color.BLACK);
-					g.fillOval(temp.x, temp.y, DIAMETER, DIAMETER);
+					g.fillOval(temp.x , temp.y , DIAMETER, DIAMETER);
+					temp.collision(this);
 					game.power_canvas.clear();
 					thick_power=0;
 				}
@@ -245,46 +198,29 @@ public class peg {
 				
 			}
 			
-			//System.out.print("temp.isActive :");
-			//System.out.println(temp.isActive);
-			temp.decay();
-			//System.out.print("thick_power :");
-			//System.out.println(thick_power);
-			
-			
+						
 		}
-		//System.out.print("thick_power_active");
-		//System.out.println(thick_power_active);
+
 	}
 	
 	public void paintTrail(Graphics2D g){
 		g.setColor(Color.BLACK);
 //		
-		//int[] x_cord = {(int) (xo + DIAMETER/2 + (Math.sin(angle))*DIAMETER/2),(int) (xo + DIAMETER/2 - (Math.sin(angle))*DIAMETER/2),(int) (x +DIAMETER/2- Math.sin(angle)*DIAMETER/2),(int) (x +DIAMETER/2 + Math.sin(angle)*DIAMETER/2)};
-		//int[] y_cord ={(int) (yo +DIAMETER/2 - Math.cos(angle)*DIAMETER/2),(int) (yo +DIAMETER/2+ Math.cos(angle)*DIAMETER/2),(int) (y +DIAMETER/2+ Math.cos(angle)*DIAMETER/2),(int) (y +DIAMETER/2- Math.cos(angle)*DIAMETER/2)};
+		int[] x_cord = {(int) (xo + (Math.sin(angle))*DIAMETER/2),(int) (xo - (Math.sin(angle))*DIAMETER/2)};
+		int[] y_cord ={(int) (yo  - Math.cos(angle)*DIAMETER/2),(int) (yo + Math.cos(angle)*DIAMETER/2)};
 		
 		Path2D.Double path = new Path2D.Double();
-		path.moveTo(xo + DIAMETER/2 + (Math.sin(angle))*DIAMETER/2, yo +DIAMETER/2 - Math.cos(angle)*DIAMETER/2);
-		path.lineTo(xo + DIAMETER/2 - (Math.sin(angle))*DIAMETER/2, yo +DIAMETER/2+ Math.cos(angle)*DIAMETER/2);
-		path.lineTo(x +DIAMETER/2- Math.sin(angle)*DIAMETER/2, y +DIAMETER/2+ Math.cos(angle)*DIAMETER/2);
-		path.lineTo(x +DIAMETER/2 + Math.sin(angle)*DIAMETER/2, y +DIAMETER/2- Math.cos(angle)*DIAMETER/2);
-		
-		/*path.moveTo(x_cord[0], y_cord[0]);
-		path.lineTo(x_cord[1], y_cord[1]);
-		path.lineTo(x_cord[2], y_cord[2]);
-		path.lineTo(x_cord[3],y_cord[3]);*/			
+		path.moveTo(xo + (Math.sin(angle))*DIAMETER/2, yo - Math.cos(angle)*DIAMETER/2);
+		path.lineTo(xo - (Math.sin(angle))*DIAMETER/2, yo + Math.cos(angle)*DIAMETER/2);
+		path.lineTo(x - Math.sin(angle)*DIAMETER/2, y + Math.cos(angle)*DIAMETER/2);
+		path.lineTo(x + Math.sin(angle)*DIAMETER/2, y - Math.cos(angle)*DIAMETER/2);
+			
 		path.closePath();
-		
-		//Rectangle2D bound_rect = path.getBounds2D();
-		
+
 		g.fill(path);
 		
-		//Polygon curr_poly = new Polygon(x_cord,y_cord, 4);
-		//Rectangle2D bound_rect = curr_poly.getBounds2D();
-		//path_new.append(bound_rect, false);
-		path_new.append(path, false);
-		//g.fill(path_new);
-		game.canvas.add(1000*x+y);
+		game.canvas.add(1000*x_cord[0]+y_cord[0]);
+		game.canvas.add(1000*x_cord[1]+y_cord[1]);
 	}
 	
 	public void keyPressed(KeyEvent e){
@@ -304,11 +240,6 @@ public class peg {
 	}
 	
 	public void keyReleased(KeyEvent e){
-		switch(e.getKeyCode()){
-//		case KeyEvent.VK_LEFT : dx = 0; break;
-//		case KeyEvent.VK_RIGHT : dx = 0; break;
-//		case KeyEvent.VK_UP : dy = 0; break;
-//		case KeyEvent.VK_DOWN : dy = 0; break;
-	}
 	}
 }
+

@@ -2,7 +2,7 @@ import java.util.List;
 
 public class thicken extends power {
 
-	final double THICKNESS_FACTOR = 1.5;
+	final double THICKNESS_FACTOR = 2.5;
 	
 	public thicken(int x,int y) {
 		// TODO Auto-generated constructor stub
